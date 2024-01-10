@@ -1,48 +1,13 @@
-type PlayerItem = {
-  name: string;
-  stack: number;
-  status: string;
-  bet: number;
-  hole_cards: Card[];
-  version: string;
-  id: number;
-};
-
-type Rank =
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | "10"
-  | "J"
-  | "Q"
-  | "K"
-  | "A";
-
-type Suit = "spades" | "hearts" | "clubs" | "diamonds";
-
-type Card = {
-  rank: Rank;
-  suit: Suit;
-};
-
-type GameState = {
-  players: PlayerItem[];
-  tournament_id: string;
-  game_id: string;
-  round: number;
-  bet_index: number;
-  small_blind: number;
-  orbits: number;
-  dealer: number;
-  community_cards: Card[];
-  current_buy_in: number;
-  pot: number;
-};
+import {
+  Combination,
+  combinationMapping,
+  combinationStrength,
+  PlayerItem,
+  Rank,
+  Suit,
+  Card,
+  GameState,
+} from "./types";
 
 export class Player {
   public betRequest(
@@ -52,7 +17,10 @@ export class Player {
     console.log(gameState);
     const me = this.getMe(gameState);
     const hasPair = this.hasPair(gameState);
-    betCallback(hasPair ? me.stack : 0);
+    const highCard = me.hole_cards.find(
+      (card) => card.rank === "A" || card.rank === "K"
+    );
+    betCallback(hasPair || highCard ? me.stack : 0);
   }
 
   hasPair = (gameState: GameState): boolean => {
