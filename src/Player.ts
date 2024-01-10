@@ -84,7 +84,7 @@ export class Player {
       }
     }
 
-    betCallback(myBet);
+    betCallback(Math.ceil(myBet));
   }
 
   getRaise = (
