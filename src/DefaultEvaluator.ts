@@ -1,5 +1,5 @@
-import {Card} from "./Player";
-import {Rank} from "./Player";
+import {Card} from "./types"
+import {Rank} from "./types";
 import {Evaluator} from "./Evaluator";
 
 class DefaultEvaluator implements Evaluator {
