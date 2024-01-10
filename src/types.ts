@@ -36,6 +36,7 @@ export type GameState = {
   game_id: string;
   round: number;
   bet_index: number;
+  minimum_raise: number;
   small_blind: number;
   orbits: number;
   dealer: number;

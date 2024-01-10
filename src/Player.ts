@@ -9,6 +9,9 @@ import {
   GameState,
 } from "./types";
 
+const TOTAL_CARDS = 52;
+const UNIQUE_HANDS = 7462;
+
 const evaluator = new DefaultEvaluator();
 
 export class Player {
@@ -25,10 +28,18 @@ export class Player {
     betCallback(
       evaluator.evaluate([...me.hole_cards, ...gameState.community_cards]) >=
         2 || highCard
-        ? me.stack
+        ? this.getRaise(gameState.current_buy_in, gameState.minimum_raise, me)
         : 0
     );
   }
+
+  getRaise = (
+    current_buy_in: number,
+    minimum_raise: number,
+    me: PlayerItem
+  ): number => {
+    return current_buy_in - me.bet + minimum_raise;
+  };
 
   getStage = ({ community_cards }: GameState): Stage => {
     if (community_cards.length === 0) return "preflop";
@@ -37,6 +48,18 @@ export class Player {
     if (community_cards.length === 5) return "river";
     return "preflop";
   };
+
+  calculateOddsOfWinning(holeCards: Card[], communityCards: Card[]): number {
+    const allCards = [...holeCards, ...communityCards];
+    const handStrength = evaluator.evaluate([...holeCards, ...communityCards]);
+    const totalOutcomes = Math.pow(TOTAL_CARDS - allCards.length, 2);
+    const winningOutcomes = (totalOutcomes * handStrength) / 7462;
+
+    // The odds of winning are the ratio of winning outcomes to total outcomes
+    const oddsOfWinning = winningOutcomes / totalOutcomes;
+
+    return oddsOfWinning;
+  }
 
   getTable = (gameState: GameState): Card[] => {
     return gameState.community_cards;
