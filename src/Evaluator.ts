@@ -1,5 +1,7 @@
-import { Card } from "./types";
+import {Card, PokerHand} from "./types";
 
 export interface Evaluator {
-  evaluate(hand: Card[]): number;
+    evaluate(hand: Card[]): number;
+
+    evaluateAndGetPokerHand(hand: Card[]): PokerHand;
 }
