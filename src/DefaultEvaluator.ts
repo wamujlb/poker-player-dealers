@@ -1,4 +1,4 @@
-import {Card, PokerHand, Rank} from "./types"
+import { Card, PokerHand, Suit, Rank } from "./types"
 import {Evaluator} from "./Evaluator";
 
 
@@ -46,23 +46,28 @@ export class DefaultEvaluator implements Evaluator {
     }
 
     private isRoyalFlush(hand: Card[]): boolean {
-        const suits = hand.map(card => card.suit);
-        const ranks = hand.map(card => card.rank);
+        // const suits = hand.map(card => card.suit);
+        // const ranks = hand.map(card => card.rank);
 
-        const isSameSuit = suits.every((suit) => suit === suits[0]);
-        const hasRoyalCards = ['A', 'K', 'Q', 'J', '10'].every((rank) => ranks.includes(rank as Rank));
+        // const isSameSuit = suits.every((suit) => suit === suits[0]);
+        // const hasRoyalCards = ['A', 'K', 'Q', 'J', '10'].every((rank) => ranks.includes(rank as Rank));
 
-        return isSameSuit && hasRoyalCards;
+        // return isSameSuit && hasRoyalCards;
+        return false;
     }
 
     private isStraightFlush(hand: Card[]): boolean {
-        const suits = hand.map(card => card.suit);
-        const ranks = hand.map(card => this.cardValue(card)).sort((a, b) => a - b);
+        // const sortedHand = [...hand].sort((a,b) => this.cardValue(a) - this.cardValue(b));
 
-        const isSameSuit = suits.every((suit) => suit === suits[0]);
-        const isSequence = ranks.every((rank, index) => index === 0 || rank === ranks[index - 1] + 1);
+        // for (let i = 0; i <= ranks.length - 5; i++) {
+        //   const isSameSuit = suits.slice(i, i + 5).every((suit) => suit === suits[i]);
+        //   const isSequence = ranks.slice(i, i + 5).every((rank, index) => index === 0 || rank === ranks[i + index - 1] + 1);
+        //   if (isSameSuit && isSequence) {
+        //     return true;
+        //   }
+        // }
 
-        return isSameSuit && isSequence;
+        return false;
     }
 
     private isFourOfAKind(hand: Card[]): boolean {
@@ -88,13 +93,40 @@ export class DefaultEvaluator implements Evaluator {
     }
 
     private isFlush(hand: Card[]): boolean {
-        const suits = hand.map(card => card.suit);
-        return suits.every((suit) => suit === suits[0]);
+        const suits: Record<Suit, number> = {
+            'clubs': 0,
+            'diamonds': 0,
+            'hearts': 0,
+            'spades': 0,
+        }
+
+        for (const card of hand) {
+            suits[card.suit] += 1
+        }
+
+        for (const group of Object.values(suits)) {
+            if (group >= 5) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private isStraight(hand: Card[]): boolean {
-        const ranks = hand.map(card => this.cardValue(card)).sort((a, b) => a - b);
-        return ranks.every((rank, index) => index === 0 || rank === ranks[index - 1] + 1);
+        const ranks = [...new Set(hand.map(card => this.cardValue(card)).sort((a, b) => a - b))];
+
+        if (ranks.length < 5) {
+            return false
+        }
+
+        for (let i = 0; i <= ranks.length - 5; i += 1) {
+            if (ranks.slice(i, i + 5).every((rank, index) => index === 0 || rank === ranks[index - 1] + 1)) {
+                return true
+            }
+        }
+
+        return false;
     }
 
     private isThreeOfAKind(hand: Card[]): boolean {
