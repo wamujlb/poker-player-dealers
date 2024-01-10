@@ -3,7 +3,7 @@ type PlayerItem = {
   stack: number;
   status: string;
   bet: number;
-  hole_cards: HoleCard[];
+  hole_cards: Card[];
   version: string;
   id: number;
 };
@@ -25,7 +25,7 @@ type Rank =
 
 type Suit = "spades" | "hearts" | "clubs" | "diamonds";
 
-type HoleCard = {
+type Card = {
   rank: Rank;
   suit: Suit;
 };
@@ -39,7 +39,7 @@ type GameState = {
   small_blind: number;
   orbits: number;
   dealer: number;
-  community_cards: HoleCard[];
+  community_cards: Card[];
   current_buy_in: number;
   pot: number;
 };
@@ -51,8 +51,22 @@ export class Player {
   ): void {
     console.log(gameState);
     const me = this.getMe(gameState);
-    betCallback(Math.min(gameState.current_buy_in * 2, me.stack));
+    const hasPair = this.hasPair(gameState);
+    betCallback(hasPair ? me.stack : 0);
   }
+
+  hasPair = (gameState: GameState): boolean => {
+    const me = this.getMe(gameState);
+    const myCards = me.hole_cards;
+    if (myCards[0].rank === myCards[1].rank) {
+      return true;
+    }
+    return false;
+  };
+
+  getTable = (gameState: GameState): Card[] => {
+    return gameState.community_cards;
+  };
 
   getMe = (gameState: GameState): PlayerItem => {
     return gameState.players.find((player) => player.name === "Dealers")!;
