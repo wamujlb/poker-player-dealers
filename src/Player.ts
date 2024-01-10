@@ -8,7 +8,7 @@ type PlayerItem = {
   id: number;
 };
 
-type Rank =
+export type Rank =
   | "2"
   | "3"
   | "4"
@@ -25,7 +25,7 @@ type Rank =
 
 type Suit = "spades" | "hearts" | "clubs" | "diamonds";
 
-type Card = {
+export type Card = {
   rank: Rank;
   suit: Suit;
 };
