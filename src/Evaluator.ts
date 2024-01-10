@@ -1,5 +1,5 @@
-import {Card} from "./Player";
+import { Card } from "./types";
 
 export interface Evaluator {
-    evaluate(hand: Card[]): number;
+  evaluate(hand: Card[]): number;
 }

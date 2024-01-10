@@ -1,3 +1,4 @@
+import { DefaultEvaluator } from "./DefaultEvaluator";
 import {
   Combination,
   combinationMapping,
@@ -9,6 +10,8 @@ import {
   GameState,
 } from "./types";
 
+const evaluator = new DefaultEvaluator();
+
 export class Player {
   public betRequest(
     gameState: GameState,
@@ -16,21 +19,14 @@ export class Player {
   ): void {
     console.log(gameState);
     const me = this.getMe(gameState);
-    const hasPair = this.hasPair(gameState);
-    const highCard = me.hole_cards.find(
-      (card) => card.rank === "A" || card.rank === "K"
-    );
-    betCallback(hasPair || highCard ? me.stack : 0);
-  }
 
-  hasPair = (gameState: GameState): boolean => {
-    const me = this.getMe(gameState);
-    const myCards = me.hole_cards;
-    if (myCards[0].rank === myCards[1].rank) {
-      return true;
-    }
-    return false;
-  };
+    const highCard = me.hole_cards.find((card) =>
+      ["A", "K", "Q"].includes(card.rank)
+    );
+    betCallback(
+      evaluator.evaluate(me.hole_cards) >= 2 || highCard ? me.stack : 0
+    );
+  }
 
   getTable = (gameState: GameState): Card[] => {
     return gameState.community_cards;
