@@ -1,11 +1,11 @@
-import {Card} from "./types"
-import {Rank} from "./types";
+import {Card, PokerHand, Rank} from "./types"
 import {Evaluator} from "./Evaluator";
 
-class DefaultEvaluator implements Evaluator {
+
+export class DefaultEvaluator implements Evaluator {
 
     evaluate(hand: Card[]): number {
-        hand.sort((a, b) => this.cardValue(a) - this.cardValue(b));
+        this.sort(hand);
 
         if (this.isRoyalFlush(hand)) return 10;
         if (this.isStraightFlush(hand)) return 9;
@@ -18,6 +18,26 @@ class DefaultEvaluator implements Evaluator {
         if (this.isPair(hand)) return 2;
 
         return 1; // High card
+    }
+
+    evaluateAndGetPokerHand(hand: Card[]): PokerHand {
+        this.sort(hand);
+
+        if (this.isRoyalFlush(hand)) return PokerHand.ROYAL_FLUSH;
+        if (this.isStraightFlush(hand)) return PokerHand.STRAIGHT_FLUSH;
+        if (this.isFourOfAKind(hand)) return PokerHand.FOUR_OF_A_KIND;
+        if (this.isFullHouse(hand)) return PokerHand.FULL_HOUSE;
+        if (this.isFlush(hand)) return PokerHand.FLUSH;
+        if (this.isStraight(hand)) return PokerHand.STRAIGHT;
+        if (this.isThreeOfAKind(hand)) return PokerHand.THREE_OF_A_KIND;
+        if (this.isTwoPair(hand)) return PokerHand.TWO_PAIR;
+        if (this.isPair(hand)) return PokerHand.ONE_PAIR;
+
+        return PokerHand.HIGH_CARD; // High card
+    }
+
+    private sort(hand: Card[]): Card[] {
+        return hand.sort((a, b) => this.cardValue(a) - this.cardValue(b));
     }
 
     private cardValue(card: Card): number {
