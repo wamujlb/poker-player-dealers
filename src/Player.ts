@@ -16,7 +16,7 @@ const UNIQUE_HANDS = 7462;
 const evaluator = new DefaultEvaluator();
 
 export class Player {
-  public betRequestOld(
+  public betRequest(
     gameState: GameState,
     betCallback: (bet: number) => void
   ): void {
@@ -36,7 +36,7 @@ export class Player {
     );
   }
 
-  public betRequest(
+  public betRequestNew(
     gameState: GameState,
     betCallback: (bet: number) => void
   ): void {
