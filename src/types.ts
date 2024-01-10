@@ -7,26 +7,6 @@ export type Combination =
   | "onePair"
   | "highCard";
 
-export const combinationMapping: Record<string, Combination> = {
-  "5": "fiveKind",
-  "14": "fourKind",
-  "23": "fullHouse",
-  "113": "threeKind",
-  "122": "twoPair",
-  "1112": "onePair",
-  "11111": "highCard",
-} as const;
-
-export const combinationStrength = {
-  fiveKind: 7,
-  fourKind: 6,
-  fullHouse: 5,
-  threeKind: 4,
-  twoPair: 3,
-  onePair: 1,
-  highCard: 0,
-} as const;
-
 export type PlayerItem = {
   name: string;
   stack: number;
@@ -71,4 +51,11 @@ export type GameState = {
   community_cards: Card[];
   current_buy_in: number;
   pot: number;
+};
+
+export type Stage = "preflop" | "flop" | "turn" | "river";
+
+export type MyCombination = {
+  combination: Combination;
+  highCard: Rank;
 };
