@@ -1,7 +1,7 @@
 import express from "express";
 import { Player } from "./Player";
 
-const VERSION = "Version 1";
+const VERSION = "Version Kirill";
 
 const app = express();
 const player = new Player();

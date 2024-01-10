@@ -7,6 +7,7 @@ import {
   Suit,
   Card,
   GameState,
+  PokerHand,
 } from "./types";
 
 const TOTAL_CARDS = 52;
@@ -15,22 +16,75 @@ const UNIQUE_HANDS = 7462;
 const evaluator = new DefaultEvaluator();
 
 export class Player {
+  public betRequestOld(
+    gameState: GameState,
+    betCallback: (bet: number) => void
+  ): void {
+    const me = this.getMe(gameState);
+    const currentHand = evaluator.evaluate([
+      ...me.hole_cards,
+      ...gameState.community_cards,
+    ]);
+
+    const highCard = me.hole_cards.find((card) =>
+      ["A", "K", "Q"].includes(card.rank)
+    );
+    betCallback(
+      currentHand >= 2 || highCard
+        ? this.getRaise(gameState.current_buy_in, gameState.minimum_raise, me)
+        : 0
+    );
+  }
+
   public betRequest(
     gameState: GameState,
     betCallback: (bet: number) => void
   ): void {
     const me = this.getMe(gameState);
     const currentStage = this.getStage(gameState);
-
+    const currentHand = evaluator.evaluateAndGetPokerHand([
+      ...me.hole_cards,
+      ...gameState.community_cards,
+    ]);
+    const tableHand = evaluator.evaluateAndGetPokerHand(
+      gameState.community_cards
+    );
     const highCard = me.hole_cards.find((card) =>
       ["A", "K", "Q"].includes(card.rank)
     );
-    betCallback(
-      evaluator.evaluate([...me.hole_cards, ...gameState.community_cards]) >=
-        2 || highCard
-        ? this.getRaise(gameState.current_buy_in, gameState.minimum_raise, me)
-        : 0
+    const raise = this.getRaise(
+      gameState.current_buy_in,
+      gameState.minimum_raise,
+      me
     );
+
+    let myBet = 0;
+
+    if (currentStage === "preflop") {
+      if (currentHand === PokerHand.ONE_PAIR) {
+        myBet = highCard
+          ? Math.max(raise, me.stack / 2)
+          : Math.min(raise, me.stack / 8);
+      } else {
+        myBet = Math.min(raise, highCard ? 100 : 50);
+      }
+    } else {
+      if (currentHand === PokerHand.ONE_PAIR) {
+        myBet = highCard
+          ? Math.max(raise, me.stack / 4)
+          : Math.min(raise, me.stack / 10);
+      } else if (currentHand === tableHand) {
+        myBet = Math.min(raise, highCard ? me.stack / 20 : 0);
+      } else if (currentHand === PokerHand.TWO_PAIR) {
+        myBet = Math.max(raise, me.stack / 2);
+      } else if (currentHand === PokerHand.THREE_OF_A_KIND) {
+        myBet = Math.max(raise, me.stack * 0.7);
+      } else {
+        myBet = Math.max(raise, me.stack);
+      }
+    }
+
+    betCallback(myBet);
   }
 
   getRaise = (
